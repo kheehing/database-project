@@ -18,14 +18,37 @@
         <button id="importCsvButton" class="btn btn-primary">Import CSV Data</button>
         <h2>Countries</h2>
         <table class="table table-bordered" id="countriesTable">
+            <thead>
+                <tr>
+                    <th>Country Code</th>
+                    <th>Country Name</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
         </table>
 
         <h2>Indicators</h2>
         <table class="table table-bordered" id="indicatorsTable">
+            <thead>
+                <tr>
+                    <th>Series Code</th>
+                    <th>Series Name</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
         </table>
 
         <h2>Yearly Data</h2>
         <table class="table table-bordered" id="yearlyDataTable">
+            <thead>
+                <tr>
+                    <th>Year</th>
+                    <th>Country Code</th>
+                    <th>Series Code</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
         </table>
     </div>
     <!-- jQuery library -->
@@ -46,12 +69,16 @@
                     success: function(data) {
                         // Update the 'countries' table
                         if (data.countries) {
+                            // Sort countries by name in alphabetical order
+                            data.countries.sort(function(a, b) {
+                                return a.CountryName.localeCompare(b.CountryName);
+                            });
+
                             let countriesTableBody = '';
                             data.countries.forEach(function(country) {
                                 countriesTableBody += `<tr>
                                     <td>${country.CountryCode}</td>
                                     <td>${country.CountryName}</td>
-                                    <td>${country.Region}</td>
                                 </tr>`;
                             });
                             $('#countriesTable tbody').html(countriesTableBody);
@@ -59,6 +86,11 @@
     
                         // Update the 'indicators' table
                         if (data.indicators) {
+                            // Sort indicators by name in alphabetical order
+                            data.indicators.sort(function(a, b) {
+                                return a.SeriesName.localeCompare(b.SeriesName);
+                            });
+
                             let indicatorsTableBody = '';
                             data.indicators.forEach(function(indicator) {
                                 indicatorsTableBody += `<tr>

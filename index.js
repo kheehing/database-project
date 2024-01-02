@@ -57,12 +57,22 @@ app.post("/import-csv", (req, res) => {
   fs.createReadStream(csvFilePath)
       .pipe(csvParser())
       .on('data', (row) => {
+        // ##############################################
+        // ############## Insert Countries ##############
+        // ##############################################
+
         const countryCode = row['Country Code'];
         const countryName = row['Country Name'];
-        // Insert Country
+
+        // Skip the row if countryCode or countryName is empty
+        if (!countryCode || !countryName) {
+          console.log("Skipping empty row");
+          return;
+        }
+
         // Check if the country already exists in the database
-        const checkQuery = `SELECT * FROM countries WHERE CountryCode = ? OR CountryName = ?`;
-        db.get(checkQuery, [countryCode, countryName], (err, result) => {
+        const checkQueryC = `SELECT * FROM countries WHERE CountryCode = ? OR CountryName = ?`;
+        db.get(checkQueryC, [countryCode, countryName], (err, result) => {
             
             if (err) {
                 console.error("Error checking for existing country: ", err);
@@ -71,14 +81,50 @@ app.post("/import-csv", (req, res) => {
 
             // If the country does not exist, insert it
             if (!result) {
-                const insertQuery = `INSERT INTO countries (CountryCode, CountryName) VALUES (?, ?)`;
-                db.run(insertQuery, [countryCode, countryName], (insertErr) => {
+                const insertQueryC = `INSERT INTO countries (CountryCode, CountryName) VALUES (?, ?)`;
+                db.run(insertQueryC, [countryCode, countryName], (insertErr) => {
                     if (insertErr) {
                         console.error("Error inserting new country: ", insertErr);
                     }
                 });
             }
         });
+
+        // ###############################################
+        // ############## Insert Indicators ##############
+        // ###############################################
+
+        const seriesName = row['Series Name'];
+        const seriesCode = row['Series Code'];
+
+        // Skip the row if seriesName or seriesCode is empty
+        if (!seriesName || !seriesCode) {
+          console.log("Skipping empty row");
+          return;
+        }
+
+        // Check if the indicators already exists in the database
+        const checkQueryI = `SELECT * FROM indicators WHERE SeriesName = ? OR SeriesCode = ?`;
+        db.get(checkQueryI, [seriesName, seriesCode], (err, result) => {
+            
+            if (err) {
+                console.error("Error checking for existing indicator: ", err);
+                return;
+            }
+
+            // If the indicators does not exist, insert it
+            if (!result) {
+                const insertQueryI = `INSERT INTO indicators (SeriesName, SeriesCode) VALUES (?, ?)`;
+                db.run(insertQueryI, [seriesName, seriesCode], (insertErr) => {
+                    if (insertErr) {
+                        console.error("Error inserting new indicator: ", insertErr);
+                    }
+                });
+            }
+        });
+        // ###############################################
+        // ############## Insert Yearl Data ##############
+        // ###############################################
     })
       .on('end', () => {
           console.log('CSV file successfully processed');
