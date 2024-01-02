@@ -72,10 +72,29 @@ app.post("/import-csv", (req, res) => {
   fs.createReadStream(csvFilePath)
       .pipe(csvParser())
       .on('data', (row) => {
-        console.log(row);
-          // Logic to insert row into the database
-          // Example: db.run("INSERT INTO your_table (...) VALUES (...)", [...values], (err) => { ... });
-      })
+        const countryCode = row['Country Code'];
+        const countryName = row['Country Name'];
+        // Insert Country
+        // Check if the country already exists in the database
+        const checkQuery = `SELECT * FROM countries WHERE CountryCode = ? OR CountryName = ?`;
+        db.get(checkQuery, [countryCode, countryName], (err, result) => {
+            
+            if (err) {
+                console.error("Error checking for existing country: ", err);
+                return;
+            }
+
+            // If the country does not exist, insert it
+            if (!result) {
+                const insertQuery = `INSERT INTO countries (CountryCode, CountryName) VALUES (?, ?)`;
+                db.run(insertQuery, [countryCode, countryName], (insertErr) => {
+                    if (insertErr) {
+                        console.error("Error inserting new country: ", insertErr);
+                    }
+                });
+            }
+        });
+    })
       .on('end', () => {
           console.log('CSV file successfully processed');
           res.send("CSV Data Imported Successfully");
