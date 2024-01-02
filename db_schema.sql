@@ -6,7 +6,6 @@ BEGIN TRANSACTION;
 CREATE TABLE IF NOT EXISTS countries (
     CountryCode VARCHAR(10) PRIMARY KEY,
     CountryName VARCHAR(255),
-    Region VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS indicators (

@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const port = 8080;
 const sqlite3 = require('sqlite3').verbose();
+const csvParser = require('csv-parser');
+const fs = require('fs');
 
 //items in the global namespace are accessible throught out the node application
 global.db = new sqlite3.Database('./database.db',function(err){
@@ -18,8 +20,67 @@ global.db = new sqlite3.Database('./database.db',function(err){
 app.set('view engine', 'ejs');
 
 app.get("/", (req, res) => {
-    res.render("index");
+  // Fetch data from the database
+  db.all("SELECT * FROM countries", [], (err, countries) => {
+      if (err) {
+          console.error(err);
+          res.send("Error fetching countries");
+          return;
+      }
+
+      // Similarly, fetch data for indicators and yearly_data
+      // For demonstration, let's assume these are empty arrays for now
+      let indicators = [];
+      let yearly_data = [];
+
+      // Render the template with the data
+      res.render("index", { countries: countries, indicators: indicators, yearly_data: yearly_data });
   });
+});
+
+app.get("/get-latest-data", (req, res) => {
+  // Fetch data from all three tables
+  db.all("SELECT * FROM countries", [], (err, countries) => {
+      if (err) {
+          console.error(err);
+          res.json({ error: "Error fetching countries" });
+          return;
+      }
+
+      db.all("SELECT * FROM indicators", [], (err, indicators) => {
+          if (err) {
+              console.error(err);
+              res.json({ error: "Error fetching indicators" });
+              return;
+          }
+
+          db.all("SELECT * FROM yearly_data", [], (err, yearly_data) => {
+              if (err) {
+                  console.error(err);
+                  res.json({ error: "Error fetching yearly data" });
+              } else {
+                  res.json({ countries, indicators, yearly_data });
+              }
+          });
+      });
+  });
+});
+
+app.post("/import-csv", (req, res) => {
+  const csvFilePath = './data/world development indicators.csv';
+
+  fs.createReadStream(csvFilePath)
+      .pipe(csvParser())
+      .on('data', (row) => {
+        console.log(row);
+          // Logic to insert row into the database
+          // Example: db.run("INSERT INTO your_table (...) VALUES (...)", [...values], (err) => { ... });
+      })
+      .on('end', () => {
+          console.log('CSV file successfully processed');
+          res.send("CSV Data Imported Successfully");
+      });
+});
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);

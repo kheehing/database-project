@@ -14,6 +14,8 @@
 </head>
 <body>
     <div class="container mt-5">
+        <br>
+        <button id="importCsvButton" class="btn btn-primary">Import CSV Data</button>
         <h2>Countries</h2>
         <table class="table table-bordered">
             <thead>
@@ -82,5 +84,81 @@
 
     <!-- Add jQuery library -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            function fetchData() {
+                $.ajax({
+                    url: '/get-latest-data',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        // Update the 'countries' table
+                        if (data.countries) {
+                            let countriesTableBody = '';
+                            data.countries.forEach(function(country) {
+                                countriesTableBody += `<tr>
+                                    <td>${country.CountryCode}</td>
+                                    <td>${country.CountryName}</td>
+                                    <td>${country.Region}</td>
+                                </tr>`;
+                            });
+                            $('#countriesTable tbody').html(countriesTableBody);
+                        }
+    
+                        // Update the 'indicators' table
+                        if (data.indicators) {
+                            let indicatorsTableBody = '';
+                            data.indicators.forEach(function(indicator) {
+                                indicatorsTableBody += `<tr>
+                                    <td>${indicator.SeriesCode}</td>
+                                    <td>${indicator.SeriesName}</td>
+                                </tr>`;
+                            });
+                            $('#indicatorsTable tbody').html(indicatorsTableBody);
+                        }
+    
+                        // Update the 'yearly_data' table
+                        if (data.yearly_data) {
+                            let yearlyDataTableBody = '';
+                            data.yearly_data.forEach(function(data) {
+                                yearlyDataTableBody += `<tr>
+                                    <td>${data.Year}</td>
+                                    <td>${data.CountryCode}</td>
+                                    <td>${data.SeriesCode}</td>
+                                    <td>${data.Value}</td>
+                                </tr>`;
+                            });
+                            $('#yearlyDataTable tbody').html(yearlyDataTableBody);
+                        }
+                    },
+                    error: function(error) {
+                        console.log("Error fetching data: ", error);
+                    }
+                });
+            }
+    
+            // Poll the server every 10 seconds
+            setInterval(fetchData, 10000);
+        });
+        // ##################################################
+        // ################ Import CSV to DB ################
+        // ##################################################
+
+        $(document).ready(function() {
+            $('#importCsvButton').click(function() {
+                $.ajax({
+                    url: '/import-csv',
+                    type: 'POST',
+                    success: function(response) {
+                        alert(response);
+                    },
+                    error: function(error) {
+                        console.log("Error importing CSV: ", error);
+                        alert("Error importing CSV");
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
