@@ -17,61 +17,15 @@
         <br>
         <button id="importCsvButton" class="btn btn-primary">Import CSV Data</button>
         <h2>Countries</h2>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Country Code</th>
-                    <th>Country Name</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% countries.forEach(function(country) { %>
-                    <tr>
-                        <td><%= country.CountryCode %></td>
-                        <td><%= country.CountryName %></td>
-                    </tr>
-                <% }); %>
-            </tbody>
+        <table class="table table-bordered" id="countriesTable">
         </table>
 
         <h2>Indicators</h2>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Series Code</th>
-                    <th>Series Name</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% indicators.forEach(function(indicator) { %>
-                    <tr>
-                        <td><%= indicator.SeriesCode %></td>
-                        <td><%= indicator.SeriesName %></td>
-                    </tr>
-                <% }); %>
-            </tbody>
+        <table class="table table-bordered" id="indicatorsTable">
         </table>
 
         <h2>Yearly Data</h2>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Year</th>
-                    <th>Country Code</th>
-                    <th>Series Code</th>
-                    <th>Value</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% yearly_data.forEach(function(data) { %>
-                    <tr>
-                        <td><%= data.Year %></td>
-                        <td><%= data.CountryCode %></td>
-                        <td><%= data.SeriesCode %></td>
-                        <td><%= data.Value %></td>
-                    </tr>
-                <% }); %>
-            </tbody>
+        <table class="table table-bordered" id="yearlyDataTable">
         </table>
     </div>
     <!-- jQuery library -->
@@ -137,6 +91,7 @@
     
             // Poll the server every 10 seconds
             setInterval(fetchData, 10000);
+            fetchData();
         });
         // ##################################################
         // ################ Import CSV to DB ################

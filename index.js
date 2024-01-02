@@ -20,22 +20,7 @@ global.db = new sqlite3.Database('./database.db',function(err){
 app.set('view engine', 'ejs');
 
 app.get("/", (req, res) => {
-  // Fetch data from the database
-  db.all("SELECT * FROM countries", [], (err, countries) => {
-      if (err) {
-          console.error(err);
-          res.send("Error fetching countries");
-          return;
-      }
-
-      // Similarly, fetch data for indicators and yearly_data
-      // For demonstration, let's assume these are empty arrays for now
-      let indicators = [];
-      let yearly_data = [];
-
-      // Render the template with the data
-      res.render("index", { countries: countries, indicators: indicators, yearly_data: yearly_data });
-  });
+  res.render("index");
 });
 
 app.get("/get-latest-data", (req, res) => {
