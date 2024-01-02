@@ -5,12 +5,75 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="stylesheets/style.css">
-
     <!-- BOOTSTRAP -->
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 
+
+    <title>CM3010</title>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Countries</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Country Code</th>
+                    <th>Country Name</th>
+                    <th>Region</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% countries.forEach(function(country) { %>
+                    <tr>
+                        <td><%= country.CountryCode %></td>
+                        <td><%= country.CountryName %></td>
+                        <td><%= country.Region %></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+
+        <h2>Indicators</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Series Code</th>
+                    <th>Series Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% indicators.forEach(function(indicator) { %>
+                    <tr>
+                        <td><%= indicator.SeriesCode %></td>
+                        <td><%= indicator.SeriesName %></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+
+        <h2>Yearly Data</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Year</th>
+                    <th>Country Code</th>
+                    <th>Series Code</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% yearly_data.forEach(function(data) { %>
+                    <tr>
+                        <td><%= data.Year %></td>
+                        <td><%= data.CountryCode %></td>
+                        <td><%= data.SeriesCode %></td>
+                        <td><%= data.Value %></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
     <!-- jQuery library -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 
@@ -19,19 +82,5 @@
 
     <!-- Add jQuery library -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <title>CM3010</title>
-</head>
-<body>
-    <section class="hero text-light text-center py-5">
-        <div class="container">
-            <h1 class="display-4">In the Realm of the Log, There's 
-                <span class="text-center"><span class="only">Only</span><span class="blog">Blog</span></span></h1>
-            <p class="lead">In the realm of logs, where thoughts meet words, OnlyBlog reigns as the ultimate platform for passionate bloggers, offering a captivating space to unleash creativity, share insights, and engage in a vibrant community.</p>
-                <div class="d-flex justify-content-center">
-                    <a id="register" class="btn btn-primary" href="/register">Get Started</a>
-                    <a id="login" class="btn btn-secondary" href="/login">login</a>
-                </div>
-        </div>
-      </section>
 </body>
 </html>
