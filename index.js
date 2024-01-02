@@ -97,39 +97,54 @@ app.post("/import-csv", (req, res) => {
         const seriesName = row['Series Name'];
         const seriesCode = row['Series Code'];
 
-        // Skip the row if seriesName or seriesCode is empty
-        if (!seriesName || !seriesCode) {
-          console.log("Skipping empty row");
-          return;
-        }
-
-        // Check if the indicators already exists in the database
-        const checkQueryI = `SELECT * FROM indicators WHERE SeriesName = ? OR SeriesCode = ?`;
-        db.get(checkQueryI, [seriesName, seriesCode], (err, result) => {
+        // Check if the indicator already exists in the database
+        const checkQueryI = `SELECT * FROM indicators WHERE SeriesCode = ? OR SeriesName = ?`;
+        db.get(checkQueryI, [seriesCode, seriesName], (err, result) => {
             
             if (err) {
-                console.error("Error checking for existing indicator: ", err);
+                console.error("Error checking for existing Indicator: ", err);
                 return;
             }
 
-            // If the indicators does not exist, insert it
+            // If the indicator does not exist, insert it
             if (!result) {
-                const insertQueryI = `INSERT INTO indicators (SeriesName, SeriesCode) VALUES (?, ?)`;
-                db.run(insertQueryI, [seriesName, seriesCode], (insertErr) => {
+                const insertQueryI = `INSERT INTO indicators (SeriesCode, SeriesName) VALUES (?, ?)`;
+                db.run(insertQueryI, [seriesCode, seriesName], (insertErr) => {
                     if (insertErr) {
                         console.error("Error inserting new indicator: ", insertErr);
                     }
                 });
             }
         });
-        // ###############################################
-        // ############## Insert Yearl Data ##############
-        // ###############################################
-    })
-      .on('end', () => {
+
+        // ################################################
+        // ############## Insert Yearly Data ##############
+        // ################################################
+
+        // Loop through each year column in the row
+        for (let year = 2000; year <= 2015; year++) {
+          const yearColumn = `${year} [YR${year}]`;
+          const value = row[yearColumn];
+
+          // Debugging: Log the values being processed
+          console.log(`Processing year ${year}: ${value}`);
+
+          if (!value || value === '..') {
+              console.log(`Skipping year ${year} due to invalid value.`);
+              continue;
+          }
+
+          const insertQueryY = `INSERT INTO yearly_data (Year, CountryCode, SeriesCode, Value) VALUES (?, ?, ?, ?)`;
+          db.run(insertQueryY, [year, countryCode, seriesCode, value], (insertErr) => {
+              if (insertErr) {
+                  console.error(`Error inserting yearly data for year ${year}: `, insertErr);
+              }
+          });
+      }
+    }).on('end', () => {
           console.log('CSV file successfully processed');
           res.send("CSV Data Imported Successfully");
-      });
+  });
 });
 
 app.listen(port, () => {
